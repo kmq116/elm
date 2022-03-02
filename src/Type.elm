@@ -1,6 +1,5 @@
 module Type exposing (..)
 
-import Browser
 import Debug exposing (toString)
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (..)
@@ -52,6 +51,4 @@ view model =
         ]
 
 
-main : Program () Model Msg
-main =
-    Browser.sandbox { init = init, update = update, view = view }
+

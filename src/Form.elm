@@ -1,4 +1,4 @@
-module Form exposing (Model, Msg(..), init)
+module Form exposing (elmForm)
 
 import Browser
 import Debug exposing (..)
@@ -15,8 +15,8 @@ type alias Model =
     }
 
 
-main : Program () Model Msg
-main =
+elmForm : Program () Model Msg
+elmForm =
     Browser.sandbox { init = init, update = update, view = view }
 
 
