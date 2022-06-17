@@ -1,97 +1,69 @@
-module Main exposing (Msg(..), main, update, view)
+module Main exposing (..)
 
 import Browser
-import CounterList
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput)
+
+
+main =
+    Browser.sandbox { init = init, update = update, view = view }
+
+
+type alias Model =
+    { name : String
+    , password : String
+    , passwordAgain : String
+    }
+
+
+init : Model
+init =
+    Model "" "" ""
 
 
 type Msg
-    = Increment
-    | Decrement
-    | Reset
-    | AddTenStep
-    | DecrementStep
+    = Name String
+    | Password String
+    | PasswordAgain String
 
 
-main : Program () CounterList.Model CounterList.Msg
-main =
-    Browser.sandbox { init = CounterList.initModel, update = CounterList.update, view = CounterList.view }
-
-
-elm : String
-elm =
-    "elm"
-
-
-sayHello : String -> String
-sayHello name =
-    "Hello, " ++ name ++ "!"
-
-
-update : Msg -> number -> number
+update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        Name name ->
+            { model | name = name }
 
-        Decrement ->
-            model - 1
+        Password password ->
+            { model | password = password }
 
-        Reset ->
-            0
-
-        AddTenStep ->
-            model + 10
-
-        DecrementStep ->
-            model - 10
+        PasswordAgain passwordAgain ->
+            { model | passwordAgain = passwordAgain }
 
 
+viewInput : String -> String -> String -> (String -> msg) -> Html msg
+viewInput t p v toMsg =
+    input [ placeholder p, value v, onInput toMsg, type_ t ] []
 
--- view 接收一个参数 model 返回 html
+
+viewValidation : Model -> Html msg
+viewValidation model =
+    if model.password == model.passwordAgain then
+        div [ style "color" "green" ] [ text "Passwords match" ]
+
+    else
+        div [ style "color" "red" ] [ text "Passwords do not match" ]
 
 
-view : Int -> Html Msg
+
+-- 三个输入框改变 model 的值 通过响应式进行校验
+
+
+view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick Decrement ] [ text "----" ]
-        , div [] [ text (String.fromInt model) ]
-        , button [ onClick Increment ] [ text "+" ]
-        , button [ onClick Reset ] [ text "reset" ]
-        , button [ onClick AddTenStep ] [ text "+10" ]
-        , button [ onClick DecrementStep ] [ text "-10" ]
-        , div [] [ text (sayHello elm) ]
-        , div [] (List.map (text << getAuthedUserName) users)
+        [ viewInput "text" "Name" model.name Name
+        , viewInput "text" "Password" model.password Password
+        , viewInput "text" "Re-enter Password" model.passwordAgain PasswordAgain
+        , viewValidation model
         ]
-
-
-
--- << 相当于 lodash 的 flowRight 函数 将两个函数结合执行并返回
-
-
-type User
-    = Anonymos
-    | Authed String
-
-
-getAuthedUserName : User -> String
-getAuthedUserName user =
-    case user of
-        Anonymos ->
-            ""
-
-        Authed name ->
-            name
-
-
-users : List User
-users =
-    [ Anonymos
-    , Authed "elm"
-    , Authed "kmq"
-    ]
-
-
-
--- type List a = Empty | Node a (List a)
